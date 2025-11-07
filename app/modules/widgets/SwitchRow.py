@@ -9,17 +9,25 @@ def SwitchRow(title: str, subtitle: str, section: str, *, invert: bool = False):
     new_switchrow._invert = invert
     new_switchrow.section = section
 
+    try:
+        opt = HyprData.get_option(new_switchrow.section)
 
-    opt = HyprData.get_option(new_switchrow.section)
+        if not opt:
+            opt = Setting(new_switchrow.section, False)
+            try:
+                HyprData.new_option(opt)
+            except RecursionError:
+                # Fallback if parser has issues - use default value
+                pass
 
-    if not opt:
-        opt = Setting(new_switchrow.section, False)
-        HyprData.new_option(opt)
-
-    if new_switchrow._invert:
-        new_switchrow.set_active(not opt.value)
-    else:
-        new_switchrow.set_active(bool(opt.value))
+        if new_switchrow._invert:
+            new_switchrow.set_active(not opt.value)
+        else:
+            new_switchrow.set_active(bool(opt.value))
+    except (RecursionError, AttributeError, Exception) as e:
+        # If there's an error accessing HyprData, use default value
+        print(f"Warning: Could not load setting {section}: {e}")
+        new_switchrow.set_active(False)
 
     new_switchrow._default = new_switchrow.get_active()
 

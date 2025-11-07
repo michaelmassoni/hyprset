@@ -1,0 +1,3 @@
+# hyprparser is not available on PyPI, install from GitHub:
+# pip install git+https://github.com/tokyob0t/hyprparser-py.git
+git+https://github.com/tokyob0t/hyprparser-py.git
