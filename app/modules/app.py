@@ -10,7 +10,6 @@ from .widgets import Icon, ToastOverlay, MyBezierEditorWindow
 class ApplicationWindow(Adw.ApplicationWindow):
     def __init__(self, app: Adw.Application):
         super().__init__(application=app)
-        self.set_title("Hyprland Settings")
         MyBezierEditorWindow.set_transient_for(self)
 
         self.root = Adw.OverlaySplitView.new()
@@ -104,25 +103,10 @@ class ApplicationWindow(Adw.ApplicationWindow):
         )
 
         self.root.add_controller(shortcut_controller)
-        
-        self.sidebar_listbox.unselect_all()
-        
-        # Show window FIRST, then load pages (so user sees something immediately)
-        self.set_visible(True)
         self.present()
-        self.set_focus()
-        
-        # Add pages after window is shown (this might take time due to HyprData access)
-        # Use GLib.idle_add to do this asynchronously so window appears immediately
-        from gi.repository import GLib
-        def load_pages():
-            try:
-                self.add_pages()
-            except Exception as e:
-                print(f"Error adding pages: {e}", file=__import__('sys').stderr)
-                import traceback
-                traceback.print_exc()
-        GLib.idle_add(load_pages)
+
+        self.sidebar_listbox.unselect_all()
+        return self.add_pages()
 
     def on_row_activated(self, _, sidebar_rowbox: Gtk.ListBoxRow):
 
@@ -145,15 +129,10 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
     def add_pages(self):
         for name, page in PAGES_DICT.items():
-            try:
-                self.main_content_view_stack.add_named(
-                    page,
-                    name,
-                )
-            except Exception as e:
-                print(f"Warning: Could not add page '{name}': {e}", file=__import__('sys').stderr)
-                import traceback
-                traceback.print_exc()
+            self.main_content_view_stack.add_named(
+                page,
+                name,
+            )
 
 
 class Application(Adw.Application):
@@ -176,19 +155,8 @@ class Application(Adw.Application):
 
     def do_activate(self) -> None:
         if not self.window:
-            try:
-                print("Creating ApplicationWindow...", file=__import__('sys').stderr)
-                self.window = ApplicationWindow(self)
-                print("ApplicationWindow created successfully", file=__import__('sys').stderr)
-            except Exception as e:
-                print(f"Error creating window: {e}", file=__import__('sys').stderr)
-                import traceback
-                traceback.print_exc(file=__import__('sys').stderr)
-                return
-        print("Presenting window...", file=__import__('sys').stderr)
-        self.window.present()
-        self.window.set_focus()
-        print("Window presented", file=__import__('sys').stderr)
+            self.window = ApplicationWindow(self)
+        return self.window.present()
 
 
 MyApplication = Application()

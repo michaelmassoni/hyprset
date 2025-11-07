@@ -72,26 +72,18 @@ class ColorExpanderRow(Adw.ExpanderRow):
             ),
         )
 
-        try:
-            opt = HyprData.get_option(self.section)
+        opt = HyprData.get_option(self.section)
 
-            if not opt:
-                opt = Setting(self.section, 0)
-                try:
-                    HyprData.new_option(opt)
-                except RecursionError:
-                    # Fallback if parser has issues - use default value
-                    pass
+        if not opt:
+            opt = Setting(self.section, 0)
+            HyprData.new_option(opt)
 
-            if isinstance(opt.value, (Gradient)):
-                color: Color
-                for color in opt.value.colors:
-                    self.add_row(
-                        ColorExpanderRow.ColorEntryRow(self, '#' + color.hex)
-                    )
-        except (RecursionError, AttributeError, Exception) as e:
-            # If there's an error accessing HyprData, use default value
-            print(f"Warning: Could not load setting {self.section}: {e}")
+        if isinstance(opt.value, (Gradient)):
+            color: Color
+            for color in opt.value.colors:
+                self.add_row(
+                    ColorExpanderRow.ColorEntryRow(self, '#' + color.hex)
+                )
 
     def update_default(self) -> None:
         pass

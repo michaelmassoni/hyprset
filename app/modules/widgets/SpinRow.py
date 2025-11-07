@@ -24,26 +24,16 @@ def Adjustment(
     ToastOverlay.instances.append(new_adjustment)
 
     if new_adjustment.section is not None:
-        try:
-            opt = HyprData.get_option(new_adjustment.section)
+        opt = HyprData.get_option(new_adjustment.section)
 
-            if not opt:
-                opt = Setting(new_adjustment.section, 1)
-                try:
-                    HyprData.new_option(opt)
-                except RecursionError:
-                    # Fallback if parser has issues - use default value
-                    pass
+        if not opt:
+            opt = Setting(new_adjustment.section, 1)
+            HyprData.new_option(opt)
 
-            if isinstance(opt.value, (int, float)):
-                new_adjustment.set_value(opt.value)
+        if isinstance(opt.value, (int, float)):
+            new_adjustment.set_value(opt.value)
 
-            new_adjustment._default = (opt.value, False)
-        except (RecursionError, AttributeError, Exception) as e:
-            # If there's an error accessing HyprData, use default value
-            print(f"Warning: Could not load setting {new_adjustment.section}: {e}")
-            new_adjustment.set_value(1)
-            new_adjustment._default = (1, False)
+        new_adjustment._default = (opt.value, False)
     else:
         new_adjustment._default = (0, False)
 
