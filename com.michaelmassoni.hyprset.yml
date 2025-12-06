@@ -9,7 +9,7 @@ finish-args:
   - --socket=wayland
   - --device=dri
   # Allow access to Hyprland config directory
-  - --filesystem=xdg-config/hypr:create
+  - --filesystem=xdg-config/hypr
   # Fallback: if user has config elsewhere (rare but possible), strict packaging might need adjustment
   # - --filesystem=home 
 
@@ -26,7 +26,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/tokyob0t/hyprparser-py
-        branch: main
+        commit: d3c7c4a2dee65885b9af5464d9df946a4aed2424
 
   # Main Application
   - name: hyprset
