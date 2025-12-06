@@ -1,4 +1,8 @@
-# Python
+# Flatpak
+.flatpak-builder/
+build-dir/
+repo/
+
 __pycache__/
 *.pyc
 *.pyo

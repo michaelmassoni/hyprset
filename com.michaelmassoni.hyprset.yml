@@ -1,0 +1,40 @@
+app-id: com.michaelmassoni.hyprset
+runtime: org.gnome.Platform
+runtime-version: '49'
+sdk: org.gnome.Sdk
+command: hyprset
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  # Allow access to Hyprland config directory
+  - --filesystem=xdg-config/hypr:create
+  # Fallback: if user has config elsewhere (rare but possible), strict packaging might need adjustment
+  # - --filesystem=home 
+
+modules:
+  # Dependency: hyprparser-py
+  - name: hyprparser
+    buildsystem: simple
+    build-commands:
+      # Use dynamic python path to support different SDK versions (e.g. 47 uses 3.12, 49 might use 3.13+)
+      - |
+        PY_VER=$(python3 -c "import sys; print(f'python{sys.version_info.major}.{sys.version_info.minor}')")
+        mkdir -p /app/lib/$PY_VER/site-packages/
+        cp -r hyprparser /app/lib/$PY_VER/site-packages/
+    sources:
+      - type: git
+        url: https://github.com/tokyob0t/hyprparser-py
+        branch: main
+
+  # Main Application
+  - name: hyprset
+    buildsystem: simple
+    build-commands:
+      # Install using pip (standard for setup.py projects)
+      # --no-build-isolation: prevent pip from trying to download build tools (network is disabled)
+      - pip3 install --prefix=/app --no-deps --no-build-isolation .
+    sources:
+      - type: dir
+        path: .

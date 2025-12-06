@@ -2,7 +2,7 @@
 
 A GTK4/LibAdwaita tool to configure your Hyprland desktop.
 
-Built using [hyprparser-py](https://github.com/michaelmassoni/hyprparser-py)
+Built using [hyprparser-py](https://github.com/tokyob0t/hyprparser-py)
 
 ![app_image](./img/app.png)
 
