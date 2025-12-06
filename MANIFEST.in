@@ -1,0 +1,3 @@
+include README.md
+recursive-include app/icons *
+include app/style.css

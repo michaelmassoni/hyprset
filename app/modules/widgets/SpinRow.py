@@ -29,12 +29,12 @@ def Adjustment(
             opt = HyprData.get_option(new_adjustment.section)
 
             if not opt:
-                opt = Setting(new_adjustment.section, 1)
-                try:
-                    HyprData.new_option(opt)
-                except RecursionError:
-                    # Fallback if parser has issues - use default value
-                    pass
+                # Fallback if parser has issues - use default value
+                opt = Setting(new_adjustment.section, 1 if data_type == int else 1.0)
+                # Note: We do NOT call HyprData.new_option(opt) here because it hangs
+                # if the parent section does not exist (parser bug).
+                # We just use the default value in the UI. If user saves, it might work or fail then,
+                # but at least the app won't freeze on load.
 
             if isinstance(opt.value, (int, float)):
                 new_adjustment.set_value(opt.value)

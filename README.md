@@ -2,7 +2,7 @@
 
 A GTK4/LibAdwaita tool to configure your Hyprland desktop.
 
-Built using [hyprparser-py](https://github.com/tokyob0t/hyprparser-py)
+Built using [hyprparser-py](https://github.com/michaelmassoni/hyprparser-py)
 
 ![app_image](./img/app.png)
 
@@ -48,20 +48,43 @@ python3 app/__main__.py
 
 ---
 
+## Features
+
+-   **Setup Wizard**: Automatically detects and downloads standard Hyprland config if missing.
+-   **Full Configuration Control**:
+    -   **General**: Gaps, borders, colors, cursor settings.
+    -   **Decoration**: Rounding, blur, opacity, shadows, dimming.
+    -   **Input**: Keyboard (Layout, Variant, Options), Mouse (Sensitivity, Accel), Touchpad, Tablet.
+    -   **Gestures**: Workspace Swipe settings.
+    -   **Miscellaneous**: Fonts, logo, disable autoreload.
+-   **Advanced Keybinding Manager**:
+    -   **List & Search**: Browse all your keybindings.
+    -   **Record**: Easily add bindings by pressing the keys.
+    -   **Edit & Delete**: Modify or remove existing bindings.
+    -   **Advanced Manual Input**: Support for `$mainMod` and manual key entry.
+    -   **Conflict Detection**: Warns before overwriting existing bindings.
+    -   **Reset to Defaults**: One-click restore of standard Hyprland bindings.
+-   **Variable Management**:
+    -   Manage custom variables (e.g., `$mainMod`, `$terminal`, `$browser`).
+    -   Smart insertion: keeps your config organized.
+-   **Advanced Mode**: Toggle to hide/show complex settings for a cleaner experience.
+
+---
+
 ## Roadmap
 
-- [ ] Support colors, gradients, etc.
+- [x] Support colors, gradients, etc.
 - [ ] Add a preview for decoration settings
-- [ ] Keybinding management
-- [ ] Environment variables management
+- [x] Keybinding management (Full CRUD + Recording)
+- [x] Environment variables management
 - [ ] Startup commands management
-- [ ] Pages:
+- [x] Pages:
   - [x] General
   - [x] Decoration
-  - [ ] Animations
-  - [ ] Input
-  - [ ] Gestures
-  - [ ] Group
-  - [ ] Misc
-  - [ ] Binds
-  - [ ] Variables
+  - [x] Animations
+  - [x] Input (with Advanced Mode)
+  - [x] Gestures (Merged into Input)
+  - [x] Misc (Miscellaneous)
+  - [x] Keybindings
+  - [x] Variables
+

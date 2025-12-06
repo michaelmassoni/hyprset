@@ -59,6 +59,32 @@ settings_borders_hover_icon_onborder = SwitchRow(
     "general:hover_icon_on_border",
 )
 
+settings_borders_border_part_of_window = SwitchRow(
+    "Border Part of Window",
+    "Treat border as part of the window for transparency/blur purposes.",
+    "general:border_part_of_window",
+)
+
+settings_borders_snap_contain_workspace_border = SwitchRow(
+    "Snap Contain Workspace Border",
+    "Snap to workspace border when moving windows.",
+    "general:snap.contain_workspace_border", # Check variable name
+)
+# Note: snap variable name might be 'general:snap:contain_workspace_border' or similar?
+# Wiki says: general:snap { enabled = true, ... }?
+# Actually Hyprland v0.30+ might have changed snapping?
+# Searching wiki... 'general' category usually has flat vars unless nested.
+# Let's assume general:snap is a flat bool or subcategory?
+# Search result didn't mention snap.
+# Safest to check manual or skip if unsure.
+# Let's skip snap for now to avoid breaking config.
+
+settings_apply_sens_to_raw = SwitchRow(
+    "Apply Sensitivity to Raw",
+    "Apply sensitivity to raw mouse input.",
+    "general:apply_sens_to_raw",
+)
+
 
 # Colors
 
@@ -192,8 +218,11 @@ for i in [
     settings_borders_resize_onborder,
     settings_borders_extend_border,
     settings_borders_hover_icon_onborder,
+    settings_borders_border_part_of_window,
 ]:
     settings_borders.add(i)
+
+settings_other.add(settings_apply_sens_to_raw)
 
 
 # Add Color settings

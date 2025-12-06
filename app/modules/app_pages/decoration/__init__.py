@@ -4,6 +4,7 @@ from ...widgets import (
     PreferencesGroup,
     SpinRow,
     SwitchRow,
+    EntryRow,
 )
 from .blur import blur_page
 from ...imports import Adw
@@ -126,11 +127,34 @@ settings_dim_around = SpinRow(
     max=1.0,
 )
 
+settings_dim_at_on_toggle = SwitchRow(
+    "Dim at on Toggle",
+    "Dim the screen when the dim toggle is enabled.",
+    "decoration:dim_at_on_toggle",
+)
+
+settings_rounding_power = SpinRow(
+    "Rounding Power",
+    "Power of the rounded corners curve (2.0 is circle, 4.0 is squircle).",
+    "decoration:rounding_power",
+    data_type=float,
+    min=2.0,
+    max=10.0,
+)
+settings_rounding.add(settings_rounding_power)
+
+settings_screen_shader = EntryRow(
+    "Screen Shader",
+    "Path to a custom screen shader (file path).",
+    "decoration:screen_shader",
+)
+
 for i in [
     settings_dim_inactive_window,
     settings_dim_strenght,
     settings_dim_special,
     settings_dim_around,
+    settings_dim_at_on_toggle,
 ]:
     settings_dim.add(i)
 
@@ -153,15 +177,17 @@ for i in [
 ]:
     settings_opacity.add(i)
 
+settings_shader = PreferencesGroup("Shader", "Custom screen shader.")
+settings_shader.add(settings_screen_shader)
 
-for i in [settings_rounding, settings_opacity, settings_shadow, settings_dim]:
+for i in [settings_rounding, settings_opacity, settings_shadow, settings_dim, settings_shader]:
     index_page_content.add(i)
 
 
 settings_blur = PreferencesGroup("", "")
 settings_blur.add(
     ButtonRow(
-        "tool-gradient-conical-symbolic",
+        "applications-graphics-symbolic",
         "Blur",
         "Size, passes, noise, contrast, vibrancy...",
         lambda *_: decoration_page.push_by_tag("blur-page"),

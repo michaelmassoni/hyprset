@@ -9,12 +9,7 @@ This module provides utilities to:
 import os
 from pathlib import Path
 
-# Import HyprData - handle both relative and absolute imports
-try:
-    from ..imports import HyprData
-except ImportError:
-    # Fallback for direct testing
-    from hyprparser import HyprData
+# HyprData import moved to functions to prevent crash on missing config
 
 
 def expand_path(path: str) -> str:
@@ -31,6 +26,12 @@ def get_config_files_info() -> list[dict]:
     """
     files_info = []
     
+    # Import HyprData lazily
+    try:
+        from ..imports import HyprData
+    except ImportError:
+        from hyprparser import HyprData
+
     # Get main config path
     main_path = HyprData.path if hasattr(HyprData, 'path') else None
     
@@ -138,3 +139,39 @@ def check_config_files() -> dict:
         'message': get_config_summary()
     }
 
+DEFAULT_CONFIG_URL = "https://raw.githubusercontent.com/hyprwm/Hyprland/main/example/hyprland.conf"
+
+
+def download_default_config(target_path: str = None) -> bool:
+    """
+    Download the default Hyprland config from GitHub and save it.
+    
+    Args:
+        target_path: Path to save config to. If None, uses default location.
+        
+    Returns:
+        True if successful, False otherwise.
+    """
+    import urllib.request
+    import shutil
+    
+    if target_path is None:
+        target_path = expand_path("$HOME/.config/hypr/hyprland.conf")
+        
+    target_path = os.path.abspath(expand_path(target_path))
+    target_dir = os.path.dirname(target_path)
+    
+    try:
+        # Create directory if it doesn't exist
+        os.makedirs(target_dir, exist_ok=True)
+        
+        # Download and save
+        with urllib.request.urlopen(DEFAULT_CONFIG_URL) as response, open(target_path, 'wb') as out_file:
+            shutil.copyfileobj(response, out_file)
+            
+        print(f"Successfully downloaded default config to {target_path}")
+        return True
+        
+    except Exception as e:
+        print(f"Error downloading default config: {e}")
+        return False

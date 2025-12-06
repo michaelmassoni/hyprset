@@ -1,4 +1,52 @@
-#/src/
-**/__pycache__/
-/build/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
 
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# IDEs
+.vscode/
+.idea/
+.mypy_cache/
+
+# Local Debugging
+debug_*.py
+debug_*.log
+app_output*.txt
+output.txt
+*.txt
+
+# OS
+.DS_Store
+Thumbs.db

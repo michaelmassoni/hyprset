@@ -10,25 +10,26 @@ def SwitchRow(title: str, subtitle: str, section: str, *, invert: bool = False):
     new_switchrow._invert = invert
     new_switchrow.section = section
 
-    try:
-        opt = HyprData.get_option(new_switchrow.section)
-
-        if not opt:
-            opt = Setting(new_switchrow.section, False)
-            try:
-                HyprData.new_option(opt)
-            except RecursionError:
-                # Fallback if parser has issues - use default value
-                pass
-
-        if new_switchrow._invert:
-            new_switchrow.set_active(not opt.value)
-        else:
-            new_switchrow.set_active(bool(opt.value))
-    except (RecursionError, AttributeError, Exception) as e:
-        # If there's an error accessing HyprData, use default value
-        print(f"Warning: Could not load setting {section}: {e}", file=sys.stderr)
+    if new_switchrow.section is None:
+        # Transient switch, not backed by config
         new_switchrow.set_active(False)
+    else:
+        try:
+            opt = HyprData.get_option(new_switchrow.section)
+
+            if not opt:
+                opt = Setting(new_switchrow.section, False)
+                # HyprData.new_option(opt) - Removed to prevent hang on missing sections
+
+            if new_switchrow._invert:
+                new_switchrow.set_active(not opt.value)
+            else:
+                new_switchrow.set_active(bool(opt.value))
+        except (RecursionError, AttributeError, Exception) as e:
+            # If there's an error accessing HyprData, use default value
+            # Only print if not NoneType error we just solved
+            print(f"Warning: Could not load setting {section}: {e}", file=sys.stderr)
+            new_switchrow.set_active(False)
 
     new_switchrow._default = new_switchrow.get_active()
 
@@ -37,6 +38,9 @@ def SwitchRow(title: str, subtitle: str, section: str, *, invert: bool = False):
             ToastOverlay.add_change()
         else:
             ToastOverlay.del_change()
+            
+        if new_switchrow.section is None:
+            return # Don't save to HyprData
 
         if new_switchrow._invert:
             return HyprData.set_option(

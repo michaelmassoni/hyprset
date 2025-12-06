@@ -2,11 +2,20 @@ from ..widgets import (
     PreferencesGroup,
     SwitchRow,
     SpinRow,
+    EntryRow,
+    ComboRow,
 )
-from ..imports import Adw
+from ..imports import Adw, Pango, PangoCairo, Gtk  # Ensure Pango/PangoCairo/Gtk are imported
 
+# Get installed fonts
+font_map = PangoCairo.FontMap.get_default()
+font_families = font_map.list_families()
+font_names = sorted([f.get_name() for f in font_families])
+# Deduplicate/Filter if needed, but names are usually unique per family object
+font_names = list( dict.fromkeys(font_names) )
 
 misc_page = Adw.PreferencesPage.new()
+
 
 # General Misc
 settings_misc = PreferencesGroup("General", "Miscellaneous settings.")
@@ -121,6 +130,27 @@ settings_misc_keyboard_move_enables_dpms = SwitchRow(
     "misc:keyboard_move_enables_dpms",
 )
 
+settings_misc_font_family = ComboRow(
+    "Font Family",
+    "Global default font family.",
+    "misc:font_family",
+    items=font_names
+)
+
+settings_misc_splash_font_family = ComboRow(
+    "Splash Font Family",
+    "Font family for splash screen.",
+    "misc:splash_font_family",
+    items=font_names
+)
+
+settings_misc_middle_click_paste = SwitchRow(
+    "Middle Click Paste",
+    "Enable middle click paste.",
+    "misc:middle_click_paste",
+)
+
+
 # Add misc settings
 for i in [
     settings_misc_force_default_wallpaper,
@@ -141,6 +171,9 @@ for i in [
     settings_misc_hide_cursor_on_touch,
     settings_misc_mouse_move_enables_dpms,
     settings_misc_keyboard_move_enables_dpms,
+    settings_misc_font_family,
+    settings_misc_splash_font_family,
+    settings_misc_middle_click_paste,
 ]:
     settings_misc.add(i)
 

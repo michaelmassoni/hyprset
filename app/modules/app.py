@@ -4,6 +4,7 @@ from .app_pages import (
     decoration_page,
 )
 import sys
+import os
 from .imports import Adw, Gdk, Gio, Gtk
 from .widgets import Icon, ToastOverlay, MyBezierEditorWindow
 from .config_manager import get_config_summary, check_config_files
@@ -19,7 +20,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
         self.breakpoint = Adw.Breakpoint.new(
             Adw.BreakpointCondition.parse('max-width: 900px')  # type: ignore
         )
-        self.set_size_request(700, 360)
+        self.set_default_size(1100, 800)
         self.set_content(self.root)
         self.add_breakpoint(self.breakpoint)
         self.breakpoint.add_setter(
@@ -112,13 +113,68 @@ class ApplicationWindow(Adw.ApplicationWindow):
         # Check and log config file status
         try:
             config_status = check_config_files()
-            if config_status['missing_files']:
+            if not config_status['main_exists']:
+                # No config found! Prompt user
+                def on_dialog_response(dialog, response):
+                    if response == 'download':
+                        from .config_manager import download_default_config
+                        if download_default_config():
+                            # Show success message
+                            import gi
+                            gi.require_version('Adw', '1')
+                            from gi.repository import Adw
+                            
+                            success_dialog = Adw.MessageDialog(
+                                transient_for=self,
+                                heading="Download Successful",
+                                body="The default Hyprland configuration has been installed.\nPlease restart the application to load the new settings.",
+                            )
+                            success_dialog.add_response("ok", "Quit")
+                            success_dialog.connect("response", lambda d, r: self.close())
+                            success_dialog.present()
+                        else:
+                            # Show error
+                            err_dialog = Adw.MessageDialog(
+                                transient_for=self,
+                                heading="Download Failed",
+                                body="Could not download the default configuration. Please check your internet connection and try again.",
+                            )
+                            err_dialog.add_response("ok", "OK")
+                            err_dialog.present()
+                    elif response == 'quit':
+                        self.close()
+                    dialog.close()
+
+                dialog = Adw.MessageDialog(
+                    transient_for=self,
+                    heading="No Config Found",
+                    body="No Hyprland configuration file was found.\nWould you like to download and install the default configuration?",
+                )
+                dialog.add_response("quit", "Quit")
+                dialog.add_response("download", "Download & Install")
+                dialog.set_response_appearance("download", Adw.ResponseAppearance.SUGGESTED)
+                dialog.connect("response", on_dialog_response)
+                dialog.present()
+                
+            elif config_status['missing_files']:
                 print(f"Warning: Missing config files: {config_status['missing_files']}", file=sys.stderr)
         except Exception as e:
             print(f"Warning: Could not check config files: {e}", file=sys.stderr)
         
         # Show window FIRST, then load pages (so user sees something immediately)
         self.set_visible(True)
+        # Add custom icons path
+        display = Gdk.Display.get_default()
+        icon_theme = Gtk.IconTheme.get_for_display(display)
+        
+        # Calculate absolute path to icons directory
+        # app.py is in app/modules/app.py
+        # icons are in app/icons
+        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        icons_path = os.path.join(base_path, "app", "icons")
+        if os.path.exists(icons_path):
+            icon_theme.add_search_path(icons_path)
+            
         self.present()
         self.set_focus()
         
@@ -223,7 +279,7 @@ class Application(Adw.Application):
     def __init__(self) -> None:
         super().__init__()
         self.window = None
-        self.set_application_id('com.tokyob0t.HyprSettings')
+        self.set_application_id('com.michaelmassoni.hyprset')
         self.set_flags(Gio.ApplicationFlags.FLAGS_NONE)
         
         # Explicitly use AdwStyleManager to avoid GTK warning

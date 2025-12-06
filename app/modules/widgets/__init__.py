@@ -19,3 +19,5 @@ from .PreferencesGroup import PreferencesGroup
 from .SpinRow import SpinRow
 from .InfoButton import InfoButton
 from .ExpanderRow import ExpanderRow
+from .EntryRow import EntryRow
+from .ComboRow import ComboRow
