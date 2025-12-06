@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Hyprset
+Comment=Configure your Hyprland desktop
+Exec=hyprset
+Icon=com.michaelmassoni.hyprset
+Type=Application
+Terminal=false
+Categories=Settings;GTK;System;
+Keywords=Hyprland;Configuration;Settings;wayland;
+StartupNotify=true

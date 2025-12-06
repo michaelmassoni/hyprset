@@ -35,6 +35,10 @@ modules:
       # Install using pip (standard for setup.py projects)
       # --no-build-isolation: prevent pip from trying to download build tools (network is disabled)
       - pip3 install --prefix=/app --no-deps --no-build-isolation .
+      # Install Desktop Entry
+      - install -D com.michaelmassoni.hyprset.desktop /app/share/applications/com.michaelmassoni.hyprset.desktop
+      # Install Icon
+      - install -D img/hypr.png /app/share/icons/hicolor/128x128/apps/com.michaelmassoni.hyprset.png
     sources:
       - type: dir
         path: .
