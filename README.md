@@ -16,6 +16,19 @@ Hyprset requires:
 - PyGObject (`gi`)
 - `hyprparser` (Python library)
 
+### Flatpak (Recommended)
+
+You can build and install **Hyprset** locally using the included manifest:
+
+```bash
+# 1. Install Builder
+sudo dnf install flatpak-builder  # Fedora
+sudo pacman -S flatpak-builder  # Arch
+
+# 2. Build & Install
+flatpak-builder --user --install --force-clean build-dir com.michaelmassoni.hyprset.yml
+```
+
 ### Manual Setup
 1. Clone the repository:
    ```bash
