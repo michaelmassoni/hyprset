@@ -3,6 +3,7 @@ from .app_pages import (
     PAGES_LIST,
     decoration_page,
 )
+import sys
 from .imports import Adw, Gdk, Gio, Gtk
 from .widgets import Icon, ToastOverlay, MyBezierEditorWindow
 from .config_manager import get_config_summary, check_config_files
@@ -111,11 +112,10 @@ class ApplicationWindow(Adw.ApplicationWindow):
         # Check and log config file status
         try:
             config_status = check_config_files()
-            print(f"Config status: {config_status['message']}", file=__import__('sys').stderr)
             if config_status['missing_files']:
-                print(f"Warning: Missing config files: {config_status['missing_files']}", file=__import__('sys').stderr)
+                print(f"Warning: Missing config files: {config_status['missing_files']}", file=sys.stderr)
         except Exception as e:
-            print(f"Warning: Could not check config files: {e}", file=__import__('sys').stderr)
+            print(f"Warning: Could not check config files: {e}", file=sys.stderr)
         
         # Show window FIRST, then load pages (so user sees something immediately)
         self.set_visible(True)
@@ -129,7 +129,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
             try:
                 self.add_pages()
             except Exception as e:
-                print(f"Error adding pages: {e}", file=__import__('sys').stderr)
+                print(f"Error adding pages: {e}", file=sys.stderr)
                 import traceback
                 traceback.print_exc()
         GLib.idle_add(load_pages)
@@ -163,7 +163,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
             try:
                 page = self.get_or_load_page(page_name)
                 if page is None:
-                    print(f"Failed to load page '{page_name}'", file=__import__('sys').stderr)
+                    print(f"Failed to load page '{page_name}'", file=sys.stderr)
                     return False
                 
                 # Switch to the page after it's loaded
@@ -177,9 +177,9 @@ class ApplicationWindow(Adw.ApplicationWindow):
                 self.main_content_view_stack.set_visible_child_name(page_name)
                 return False  # Don't repeat
             except Exception as e:
-                print(f"Error loading page '{page_name}': {e}", file=__import__('sys').stderr)
+                print(f"Error loading page '{page_name}': {e}", file=sys.stderr)
                 import traceback
-                traceback.print_exc(file=__import__('sys').stderr)
+                traceback.print_exc(file=sys.stderr)
                 return False  # Don't repeat
         
         # Load page asynchronously so UI doesn't freeze
@@ -192,7 +192,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
             general_page = PAGES_DICT['General']()
             self.main_content_view_stack.add_named(general_page, 'General')
         except Exception as e:
-            print(f"Warning: Could not add page 'General': {e}", file=__import__('sys').stderr)
+            print(f"Warning: Could not add page 'General': {e}", file=sys.stderr)
             import traceback
             traceback.print_exc()
     
@@ -211,9 +211,9 @@ class ApplicationWindow(Adw.ApplicationWindow):
                 self.main_content_view_stack.add_named(page, name)
                 return page
             except Exception as e:
-                print(f"Error: Could not load page '{name}': {e}", file=__import__('sys').stderr)
+                print(f"Error: Could not load page '{name}': {e}", file=sys.stderr)
                 import traceback
-                traceback.print_exc(file=__import__('sys').stderr)
+                traceback.print_exc(file=sys.stderr)
                 # Return None to indicate failure, but don't crash the app
                 return None
         return None
@@ -225,6 +225,11 @@ class Application(Adw.Application):
         self.window = None
         self.set_application_id('com.tokyob0t.HyprSettings')
         self.set_flags(Gio.ApplicationFlags.FLAGS_NONE)
+        
+        # Explicitly use AdwStyleManager to avoid GTK warning
+        self.style_manager = Adw.StyleManager.get_default()
+        self.style_manager.set_color_scheme(Adw.ColorScheme.DEFAULT)
+        
         self.load_css()
 
     def load_css(self) -> None:
@@ -240,18 +245,14 @@ class Application(Adw.Application):
     def do_activate(self) -> None:
         if not self.window:
             try:
-                print("Creating ApplicationWindow...", file=__import__('sys').stderr)
                 self.window = ApplicationWindow(self)
-                print("ApplicationWindow created successfully", file=__import__('sys').stderr)
             except Exception as e:
-                print(f"Error creating window: {e}", file=__import__('sys').stderr)
+                print(f"Error creating window: {e}", file=sys.stderr)
                 import traceback
-                traceback.print_exc(file=__import__('sys').stderr)
+                traceback.print_exc(file=sys.stderr)
                 return
-        print("Presenting window...", file=__import__('sys').stderr)
         self.window.present()
         self.window.set_focus()
-        print("Window presented", file=__import__('sys').stderr)
 
 
 MyApplication = Application()

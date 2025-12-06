@@ -117,7 +117,6 @@ class BezierEditor(Gtk.DrawingArea):
             case Gdk.ScrollEvent:
                 pass
             case _:
-                print(Event, type(Event))
                 pass
 
     def on_button_release(self, _):

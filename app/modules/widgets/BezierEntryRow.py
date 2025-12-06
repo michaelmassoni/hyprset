@@ -1,4 +1,5 @@
 from ..imports import Adw, Gtk, Bezier, HyprData, Tuple, string, GObject, Gdk
+import sys
 from .BezierEditor import MyBezierEditorWindow
 from .PreferencesGroup import PreferencesGroup
 
@@ -74,7 +75,7 @@ class NewBezierDialog(Adw.Dialog):
         except ValueError:
             pass
         except Exception as e:
-            print(e)
+            print(f"Error parsing bezier: {e}", file=sys.stderr)
         return (False, (0, 0, 0, 0))
 
     def parse_name(self, text: str) -> str:

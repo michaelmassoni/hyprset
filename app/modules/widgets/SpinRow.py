@@ -1,4 +1,5 @@
 from types import new_class
+import sys
 from ..imports import Gtk, Union, Type, Adw, Setting, HyprData
 from .CustomToastOverlay import ToastOverlay
 
@@ -41,7 +42,7 @@ def Adjustment(
             new_adjustment._default = (opt.value, False)
         except (RecursionError, AttributeError, Exception) as e:
             # If there's an error accessing HyprData, use default value
-            print(f"Warning: Could not load setting {new_adjustment.section}: {e}")
+            print(f"Warning: Could not load setting {new_adjustment.section}: {e}", file=sys.stderr)
             new_adjustment.set_value(1)
             new_adjustment._default = (1, False)
     else:

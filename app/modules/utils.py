@@ -4,9 +4,6 @@ import string
 
 string.ascii_lowercase = string.ascii_lowercase + ' '
 
-# Im so fukin dumb, didnt know that Gdk.RGBA had Gdk.RGBA.parse() function
-
-
 class ParseColor:
     @staticmethod
     def rgba_str_to_hex(color: str) -> str:
@@ -131,23 +128,66 @@ class ParseColor:
         return None
 
 
-# idk how else obtain a gtk theme var, so
+# Helper to get theme colors lazily
+class ThemeColors:
+    _accent = None
+    _bg = None
+    _fg = None
+    
+    @classmethod
+    def _init_colors(cls):
+        if cls._accent is not None:
+            return
+            
+        try:
+            tmp = Gtk.Box()
+            tmp.add_css_class('custom-box')
+            ctx = tmp.get_style_context()
+            provider = Gtk.CssProvider.new()
+            
+            provider.load_from_data('.custom-box {color: @accent_color; }')
+            ctx.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            cls._accent = ctx.get_color()
+            
+            provider.load_from_data('.custom-box {color: @card_bg_color; }')
+            ctx.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            cls._bg = ctx.get_color()
+            
+            provider.load_from_data('.custom-box {color: @card_fg_color; }')
+            ctx.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            cls._fg = ctx.get_color()
+        except Exception:
+            # Fallback if GTK is not initialized or fails
+            cls._accent = Gdk.RGBA(0, 0, 1, 1) # type: ignore
+            cls._bg = Gdk.RGBA(0, 0, 0, 1) # type: ignore
+            cls._fg = Gdk.RGBA(1, 1, 1, 1) # type: ignore
 
-tmp = Gtk.Box()
-tmp.add_css_class('custom-box')
+    @property
+    def accent_color(self):
+        self._init_colors()
+        return self._accent
 
-ctx = tmp.get_style_context()
+    @property
+    def bg_color(self):
+        self._init_colors()
+        return self._bg
+        
+    @property
+    def fg_color(self):
+        self._init_colors()
+        return self._fg
 
-provider = Gtk.CssProvider.new()
+theme_colors = ThemeColors()
 
-provider.load_from_data('.custom-box {color: @accent_color; }')
-ctx.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-accent_color: Gdk.RGBA = ctx.get_color()   # type: ignore
+# Proxies for backward compatibility
+class ColorProxy:
+    def __init__(self, name):
+        self.name = name
+    
+    def __getattr__(self, attr):
+        color = getattr(theme_colors, self.name)
+        return getattr(color, attr)
 
-provider.load_from_data('.custom-box {color: @card_bg_color; }')
-ctx.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-bg_color: Gdk.RGBA = ctx.get_color()   # type: ignore
-
-provider.load_from_data('.custom-box {color: @card_fg_color; }')
-ctx.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-fg_color: Gdk.RGBA = ctx.get_color()   # type: ignore
+accent_color = ColorProxy('accent_color')
+bg_color = ColorProxy('bg_color')
+fg_color = ColorProxy('fg_color')

@@ -1,5 +1,6 @@
 from .CustomToastOverlay import ToastOverlay
 from ..imports import Adw, HyprData, Setting
+import sys
 
 
 def SwitchRow(title: str, subtitle: str, section: str, *, invert: bool = False):
@@ -26,7 +27,7 @@ def SwitchRow(title: str, subtitle: str, section: str, *, invert: bool = False):
             new_switchrow.set_active(bool(opt.value))
     except (RecursionError, AttributeError, Exception) as e:
         # If there's an error accessing HyprData, use default value
-        print(f"Warning: Could not load setting {section}: {e}")
+        print(f"Warning: Could not load setting {section}: {e}", file=sys.stderr)
         new_switchrow.set_active(False)
 
     new_switchrow._default = new_switchrow.get_active()

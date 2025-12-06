@@ -1,4 +1,5 @@
 from gi.repository import Gdk
+import sys
 from ..imports import Adw, Gtk, HyprData, Gradient, Color, Setting
 from ..utils import ParseColor
 from .CustomToastOverlay import ToastOverlay
@@ -91,7 +92,7 @@ class ColorExpanderRow(Adw.ExpanderRow):
                     )
         except (RecursionError, AttributeError, Exception) as e:
             # If there's an error accessing HyprData, use default value
-            print(f"Warning: Could not load setting {self.section}: {e}")
+            print(f"Warning: Could not load setting {self.section}: {e}", file=sys.stderr)
 
     def update_default(self) -> None:
         pass
